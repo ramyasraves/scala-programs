@@ -1,0 +1,18 @@
+//Take list of integers and caluculate their sum .when num=7 it should add 14(7+7) and print the whole sum.
+  
+  def luckycheck(nums:List[Int]):Int={
+      var output=0
+      for(n <- nums){
+          if (n==7){
+              output=output+14
+          }
+          else{
+              output = output+n
+          }
+      }
+  
+  return output
+  }
+  val numbers=List(1,2,3,7)
+  println(luckycheck(numbers))
+          
