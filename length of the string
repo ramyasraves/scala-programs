@@ -1,0 +1,12 @@
+//get the length of the string
+
+object Main{
+    var str1="sana"
+
+def main (args:Array[String]){
+var len=str1.length()
+println(len)
+}
+}
+
+sanaramya
