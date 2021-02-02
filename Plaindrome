@@ -1,0 +1,7 @@
+def palindromeCheck(st:String):Boolean={
+    return (st==st.reverse)              //returns this logical statement
+                                    //there is a function in the strings which reverses the entire string.EG: st-"hello"->st.reverse  =olleh  
+    
+}
+println(palindromeCheck("ramya"))
+println(palindromeCheck("xyggyx"))
