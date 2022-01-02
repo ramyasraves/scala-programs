@@ -1,0 +1,42 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.catalyst.dsl.expressions.StringToAttributeConversionHelper
+import org.apache.spark.sql.functions._
+
+object manipulateStringColumns {
+  Logger.getLogger("org").setLevel(Level.ERROR)
+
+  def main(args: Array[String]): Unit = {
+    //work with/manipulate String columns in Spark Dataframe
+    val spark = SparkSession.builder().appName("Manipulation").master("local[*]").getOrCreate()
+    val df = spark.read.json("data/customers.json")
+    df.show()
+    //concat  customer first name and last name
+    val concat_df = df.
+      select(concat_ws(" ", col("customer_fname"), col("customer_lname"))).
+      alias("customer_fullname")
+    concat_df.show()
+    //converting a column to  upper case
+    val upper_df = df.select(upper(col("customer_city"))).alias("CITY")
+    upper_df.show()
+    val lower_df = df.select(lower(col("customer_city"))).alias("city")
+    lower_df.show()
+    //need to replace one pattern with another pattern in the string
+    val regex_df = df.select(regexp_replace(col("customer_zipcode"), pattern = "785", replacement = "666")).alias("regex_col")
+    regex_df.show()
+    //get the first 4 characters of first_name
+    val df_4 = df.select(substring(col("customer_fname"),0,4)) .alias("nickname")
+    df_4.show()
+    //split the customer_street based on the delimiter i.e split the data into an array and then we will be fetching first word from that array
+    val df_split = df.
+                   select(split(col("customer_street")," ").
+                     getItem(0).
+                     alias("street name"))
+    df_split.show()
+
+
+
+  }
+}
