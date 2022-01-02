@@ -1,0 +1,54 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+//import org.apache.spark.sql.execution.datasources.noop.NoopWriteBuilder.truncate
+
+object multipleDelimiter {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().appName("Dealing with multiple delimiters").master("local").getOrCreate()
+    val df = spark.read.option("header","true").option("delimiter","~|").csv("data/multidelimiter.csv")
+    //val df1 = spark.read.text("data/multidelimiter.csv")
+   // df1.show()
+    df.show()
+    val df2 = spark.read.option("delimiter",",").csv("data/multidelimiter_1.csv").toDF("names","Range")
+    df2.show()
+     df2.withColumn("col1",split(df2("Range"),"\\|").getItem(0))
+     .withColumn("col2",split(df2("range"),"\\|").getItem(1))
+       .withColumn("col3",split(df2("Range"),"//|").getItem(2))
+       .drop("Range")
+       .show()
+    df2.count()
+    //"|" pipe we cannot use it directly because replace can be used with multiple delimiters, and pipe is the separator when we try to do the multiple delimiter inside a replace of split
+//so we need to use \\
+//Here we have only 2 columns,if we 100 columns having delmited with pipe.how can we solve it
+
+
+    //now we take all the columns in the select, we are taking all the columns
+    //we are using this operatior "+:" for appending the original columns with the one we just split using withColumn and split operator above.
+    //Here we use (0 until 3) since we have 3 columns, --> (0 until n) if we have n columns
+    // we can get the count by using count
+    //Now we will map it and for each i , in the col("range") or df("range"), we need to get item of (instead of hard coding 0,1,2)
+//we need to say getitem(i) and we need name the columns
+    //instead of hard coding col1,col2 we say getItem(i).as(s"col$i")
+    //Now every time it will create col1,col2,col3 and we need to do it for all for all the columns so we use :_*
+    //next we need to drop the range
+
+    df2.withColumn("Range",split(df2("Range"),"\\|"))
+      .select(col("*") +: (0 until 3).
+        map(i=>col("Range").getItem(i).as(s"col$i")):_*).
+      drop("Range").
+      show()
+//first we need to split, and from the columns we need to select 3 and we got 3 columns and
+    // we are asking to give name for 3 columns and we need to append them to the original columns
+
+
+
+
+
+  }
+
+
+}
