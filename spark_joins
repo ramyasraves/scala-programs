@@ -1,0 +1,50 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.{SparkSession, expressions}
+import org.apache.spark.sql.functions.{col, rand, rank, round, sum}
+
+import java.awt
+
+object sparkJoins {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+      val spark = SparkSession.builder().master("local[*]").appName("Multiple joins in SPARKSQL").getOrCreate()
+    val products = spark.
+                   read.
+                   csv("data/products.csv").toDF("product_id","product_category_id","product_name","product_description","product_price","products_image")
+    val categories = spark.read.option("delimiter",",").csv("data/categories.csv").toDF("category_id","category_department_id","category_name")
+    categories.show()
+    val order_items = spark.
+                      read.
+                      csv("data/order_items.csv").
+                      toDF("order_item_id","order_item_order_id","order_item_product_id","order_item_quantity","order_item_subtotal","order_item_product_price")
+
+    //Get top 5 products which are having highest revenue from the Accessories category
+    //products table has joining condition with both the tables, so first we take products
+      // we don't need all the products in products table so we need to select only particular columns
+    val resultant_df = products.select("product_id","product_category_id","product_name").
+                       join(categories.select("category_id","category_name"),col("product_category_id")===col("category_id")).
+                       join(order_items.select("order_item_id","order_item_product_id","order_item_subtotal"),col("product_id")===col("order_item_product_id")).
+                       filter(col("category_name")==="Accessories").groupBy("category_name","product_name").
+                       agg(round(sum(col("order_item_subtotal")),2).alias("revenue")).
+                       withColumn("rank",rank over Window.partitionBy("category_name").orderBy("revenue")).
+      drop("rank").limit(5)
+    resultant_df.show()
+    //lets' do the same for spark sql query, to do this we have tp register all these dataframes as temporary views.
+    products.createTempView("products")
+    categories.createTempView("categories")
+    order_items.createTempView("order_items")
+    //Here we are preferring inner query
+    val result_df = spark.
+      sql(
+        """select category_name,product_name,revenue from (select category_name,product_name,Round(sum(order_item_subtotal),2) revenue,rank() over (partition by category_name order by Round(sum(order_item_subtotal),2) desc)rank from products p join categories c on p.product_category_id = c.category_id join order_items o on p.product_id = o.order_item_product_id where category_name = "Accessories" group by category_name,product_name)t1 where t1.rank<=5 """)
+    result_df.show()
+
+
+
+  }
+
+}
