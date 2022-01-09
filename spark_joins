@@ -25,6 +25,7 @@ object sparkJoins {
     //Get top 5 products which are having highest revenue from the Accessories category
     //products table has joining condition with both the tables, so first we take products
       // we don't need all the products in products table so we need to select only particular columns
+      //Joining using Dataframe API
     val resultant_df = products.select("product_id","product_category_id","product_name").
                        join(categories.select("category_id","category_name"),col("product_category_id")===col("category_id")).
                        join(order_items.select("order_item_id","order_item_product_id","order_item_subtotal"),col("product_id")===col("order_item_product_id")).
@@ -38,6 +39,7 @@ object sparkJoins {
     categories.createTempView("categories")
     order_items.createTempView("order_items")
     //Here we are preferring inner query
+    //join using SPARK-SQL
     val result_df = spark.
       sql(
         """select category_name,product_name,revenue from (select category_name,product_name,Round(sum(order_item_subtotal),2) revenue,rank() over (partition by category_name order by Round(sum(order_item_subtotal),2) desc)rank from products p join categories c on p.product_category_id = c.category_id join order_items o on p.product_id = o.order_item_product_id where category_name = "Accessories" group by category_name,product_name)t1 where t1.rank<=5 """)
