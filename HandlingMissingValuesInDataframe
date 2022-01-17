@@ -1,0 +1,46 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{col, lit, when}
+import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructField, StructType, TimestampType}
+
+object handlingMissingData {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val conf = new SparkConf().setMaster("local[*]").setAppName("valid or invalid dataframe")
+    val sc  = new SparkContext(conf)
+    val spark = SparkSession.builder().appName("Handling Missing Data in a Dataframe").master("local[*]").getOrCreate()
+    //defining schema in spark scala
+    val landingFileSchema = StructType(List(
+      StructField("sale_ID",StringType,true),
+      StructField("product_ID",StringType,true),
+      StructField("Quantity_Sold",IntegerType,true),
+        StructField("Vendor_ID",StringType,true),
+          StructField("Sale_Date",TimestampType,true),
+      StructField("Sale_Amount",DoubleType,true),
+      StructField("Sale_Currency",StringType,true)))
+    val landingFileDF = spark.read.option("delimiter","|").schema(landingFileSchema).csv("data/sales_landing.txt")
+    landingFileDF.show()
+    //dividing the data into 2 dataframes, valid and invalid one and filter out all the missing values from dataframe
+    val valid_data = landingFileDF.filter(col("Quantity_Sold").isNotNull && col("Vendor_ID").isNotNull)
+    valid_data.show()
+    val invalid_data = landingFileDF.
+                       filter(col("Quantity_Sold").isNull || col("Vendor_ID").isNull).
+                       withColumn("Hold_reason",when(col("Quantity_Sold").isNull,lit("Qty_sold is missing")).
+                        otherwise(col("Vendor_ID").isNull,lit("vendorismissing")))
+                        //Here we need to change the syntax for when and otherwise as we are getting Exception in thread "main" java.lang.RuntimeException: Unsupported literal type class scala.Tuple2 ((Vendor_ID IS NULL),vendorismissing)
+
+    invalid_data.show()
+    valid_data.write.mode("overwrite").option("delimiter","|").csv("data/valid")
+    invalid_data.write.mode("append").option("delimiter","|").csv("data/hold")
+
+
+
+
+
+
+  }
+
+}
