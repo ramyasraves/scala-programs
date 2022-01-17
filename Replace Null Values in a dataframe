@@ -1,0 +1,20 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+
+
+object replaceNullValue {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().master("local[*]").appName("Replace null values in a dataframe").getOrCreate()
+    val df = spark.read.option("delimiter",",").option("inferschema","true").option("header","true").csv("data/city.csv")
+    df.show(false)  //if we give false, dataframe will not get truncated
+    //first we replace the integer and long column related null values should be replaced with 0
+    df.na.fill(0).show(false)
+    //need to replace the null values in string type column with some string, here city column has null values
+    df.na.fill("unknown",Array("city")).show(false)
+
+  }
+
+}
