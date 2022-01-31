@@ -1,0 +1,36 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{col, split, substring}
+
+object JoinLookup {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().master("local[*]").appName("lookup").getOrCreate()
+    //Read the input file into a dataframe
+    import spark.implicits._
+    val df1 = spark.read.option("delimiter",",").option("inferschema","true").option("header","true").csv("data/user_details.csv")
+    df1.show(false)
+    val addcolumn = df1.withColumn(colName = "year",$"transaction_date".substr(7,4))
+    addcolumn.show()
+    //we can also use split function instead of this
+    addcolumn.createTempView("addcol")
+    val df2 = spark.read.option("header","true").option("inferschema","true").csv("data/valid_year.csv")
+    df2.show(false)
+    df2.createTempView("df2")
+    spark.sqlContext.sql("select transaction_id,user_name,user_type,transaction_date" +
+      "(select * from addcol a left join df2 d on a.year = d.valid_year) where valid_year IS NULL ").show()
+    spark.sqlContext.sql("select transaction_id,user_name,user_type,transaction_date" +
+      "(select * from addcol a left join df2 d on a.year = d.valid_year) where valid_year IS NOT NULL ").show()
+
+    spark.sqlContext.sql("select transaction_id,user_name,user_type,transaction_date" +
+      "(select * from addcol a left join df2 d on a.year = d.valid_year) where valid_year IS NULL ").write.option("header","true").csv("data/invalid.csv")
+    spark.sqlContext.sql("select transaction_id,user_name,user_type,transaction_date" +
+      "(select * from addcol a left join df2 d on a.year = d.valid_year) where valid_year IS NOT NULL ").write.option("header","true").csv("data/valid.csv")
+
+
+
+
+  }
+}
