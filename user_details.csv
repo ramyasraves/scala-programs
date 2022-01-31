@@ -1,0 +1,11 @@
+transaction_id,user_name,user_type,transaction_date
+1,user1,New,20-04-2018
+2,user2,Privileged,21-04-2019
+3,user3,Privileged,20-04-2018
+4,user4,New,21-04-2019
+5,user5,New,20-05-2018
+6,user6,New,24-07-2018
+7,user7,Privileged,21-04-2019
+8,user8,Privileged,07-11-2018
+9,user9,New,17-05-2019
+10,user10,New,29-06-2019
