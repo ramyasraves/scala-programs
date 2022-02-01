@@ -1,0 +1,19 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.regexp_replace
+
+object replaceString {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().master("local[*]").appName("lookup").getOrCreate()
+    import spark.implicits._
+    val df = spark.read.option("delimiter", ",").option("header", "true").csv("data/personal_transactions.csv")
+    df.show(false)
+//Now we need to replace the value "checking" with "cash" in  Card_type
+    val df2 = df.withColumn("Card_type",regexp_replace($"Card_type","Checking","Cash"))
+    df2.show(false)
+
+  }
+}
