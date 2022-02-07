@@ -1,0 +1,68 @@
+package com.sundogsoftware.spark
+
+import org.apache.parquet.format.IntType
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions.{asc, col, row_number, to_timestamp}
+import org.apache.spark.sql.types.{DateType, IntegerType, StringType, StructField, StructType}
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.{Row, SparkSession}
+import spire.compat.integral
+
+
+
+
+object joinAndWindowFunction {
+  def main(args: Array[String]): Unit = {
+    val conf = new SparkConf().setAppName("Cross join").setMaster("local[*]")
+    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder().appName("using Cross join and window function").master("local[*]").getOrCreate()
+    //to make it a bit complex , we are adding 2 bus ids
+    //val list_data = sc.parallelize(List((1, "Station1", "4:20AM"), (1, "station3", "7:30AM"), (2, "station2", "5:50AM"), (2, "station4", "7:30AM"), (2, "station5", "11:30AM"), (2, "station6", "1:30PM")))
+    //list_data.collect().foreach(println)
+    val data = List(Row(1,"Station1","4:20AM"),Row(1, "station2", "5:30AM"),Row(1, "station3", "7:30AM"),Row(2, "station2", "5:50AM"),Row(2, "station4", "7:30AM"),Row(2, "station5", "11:30AM"),Row(2,"station6","1:30PM"))
+    val schema = StructType(List(StructField("Bus_ID",IntegerType,true),
+      StructField("Station",StringType,true),
+      StructField("Time",StringType,true)))
+    //convert list to RDD
+    val rdd = sc.parallelize(data)
+    //create Dataframe
+    val df = spark.createDataFrame(rdd,schema)
+    df.show(false)
+    //Applying cross join, each records in the left side table will be combined with each record in right side table. for each record in left side table we have 7 combinations
+// if we give on condition,based on that column join condition happens .now we apply on Bus_ID, so for each Bus_ID, we have combinations on right side records
+//val df2 = df.join(df,df("Bus_ID")===df("Bus_ID"))
+    val dfjoin = df.as("df1").join(df.as("df2"),col("df1.Bus_ID")===col("df2.Bus_ID"),"cross")
+    //Here the ambiguity raised between 2 Bus_IDs
+    dfjoin.show(false)
+    // now we take df2 as source and we have Bus_ID and source station as first station and destination station as second stationa
+    //and we calculate the time difference between the couple of columns that we have
+    //but we don't need same station in both source and destination stations and alse it should n't have recerse case
+    //like station 2 tos station1 etc.
+      //we have 2 handle 2 scenarios, we can use windowing function
+    //Apply Window Function to get row_num
+    val windowSpec = Window.partitionBy("df2.Bus_ID").orderBy(to_timestamp(col("df2.Time"),"hh:mm a"))
+    windowSpec
+    val df_wind = dfjoin.withColumn("row_num",row_number().over(windowSpec))
+    df_wind.show(false)
+    //now we don't need any reverse paths, we need only forward paths
+    val df_out = df_wind.join(df_wind.alias("df2_wind"),(col("df2_wind.row_num")<col("df2_wind.row_num"))&& col("df_wind.Bus_ID")===col("df2_wind.Bus_ID")).
+      select(df_wind("Bus_ID"),df_wind("Station").alias("Source_Point"),df_wind("Time").alias("Source_Time"),col("df2_wind.Station").alias("Destination_Point"),col("df2_wind.Time").
+        alias("Destination_Time"))
+    df_out.show(false)
+print("Output Spark Dataframe")
+    //now we get the time after source_Time from Destination_Time and to get the time difference in minutes we do /60
+    val df_final = df_out.withColumn("Travel_Time",
+      (to_timestamp(col("Destination_Time"),"hh:mm a").cast("long"))-to_timestamp(col("Source_Time"),"hh:mm a").cast("long")).drop("Source_Time","Destination_Time").orderBy("Source_Point","Destination_Point")
+
+    df_final.show()
+
+
+
+
+      //"Time",'hh:mm a').asc())
+
+
+
+
+  }
+}
