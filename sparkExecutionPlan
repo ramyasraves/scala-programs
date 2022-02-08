@@ -1,0 +1,44 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+
+object sparkExecutionPlan {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().master("local[*]").appName("Spark Execution plan").getOrCreate()
+    val in_part = spark.read.option("header","true").csv("data/googleplaystore.csv")
+    in_part.show()
+    in_part.select("Price").show()
+    //spark is lazily evaluated but execution plan is not lazily evaluated
+    //in_part.select("Price1")
+    //even though we don't trigger any action in execution plan. with the help of execution plan, the statement is thrown
+    //as an error message saying that cannot resolve '`Price1`' given input columns:
+    in_part.select("Price").explain()
+    //if we give explain , it will directly show the physical plan. first it scans for the csv file with column price alone
+    //from the location that we are defining
+    // output: 
+    //== Physical Plan ==
+//FileScan csv [Price#23] Batched: false, DataFilters: [], Format: CSV, Location: InMemoryFileIndex[file:/E:/SparkScalaCourseUdemy/SparkScalaCourse/data/googleplaystore.csv], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<Price:string>
+
+in_part.filter("Rating >= 3").groupBy("Category").count().show()
+    //we will getting count for each Category for which the raing is >=3
+    //let's run explain() on this statement to understand how the unresolved logical plan to physical plan gets created
+
+    in_part.filter("Rating >= 3").groupBy("Category").count().explain(mode = "simple")
+    //= Physical Plan ==
+AdaptiveSparkPlan isFinalplan = false    
+*(2) HashAggregate(keys=[Category#17], functions=[count(1)])
++- Exchange hashpartitioning(Category#17, 200), true, [id=#85]
+   +- *(1) HashAggregate(keys=[Category#17], functions=[partial_count(1)])
+      +- *(1) Project [Category#17]
+         +- *(1) Filter (isnotnull(Rating#18) AND (cast(Rating#18 as int) >= 3))
+            +- FileScan csv [Category#17,Rating#18] Batched: false, DataFilters: [isnotnull(Rating#18), (cast(Rating#18 as int) >= 3)], Format: CSV, Location: InMemoryFileIndex[file:/E:/SparkScalaCourseUdemy/SparkScalaCourse/data/googleplaystore.csv], PartitionFilters: [], PushedFilters: [IsNotNull(Rating)], ReadSchema: struct<Category:string,Rating:string>
+
+//it is an adaptive spark plan and it is not a final plan so it is false.
+// During the execution of AdaptiveSparkPlan, what spark does is --> during execution, it will collect the stats and if there is any change needed in the Physical plan , it will
+//make changes during the final execution so that's why it is marked as false--> isFinalplan = false
+  
+  }
+
+}
