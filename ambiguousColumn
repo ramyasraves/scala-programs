@@ -1,0 +1,49 @@
+package com.sundogsoftware.spark // need to complete this
+
+import com.sundogsoftware.spark.performanceTuning.spark
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf, SparkContext}
+
+object ambiguousColumn {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val conf = new SparkConf().setAppName("Ambigious Column").setMaster("local[*]")
+    val sc = new SparkContext(conf)
+    spark.conf.set("spark.sql.adaptive.enabled", true)
+    val Spark = SparkSession.builder().appName("Dealing with ambigious column in dataframe").master("local[*]").getOrCreate()
+    val df1 = spark.read.option("header", "true").option("delimiter", ",").csv("data/trans.csv")
+    df1.show()
+    val jsondf = spark.read.option("multiline", "true").json("data/input1.json")
+    jsondf.show()
+    val jsonflatten = jsondf.select("*", "Delivery.*").drop("Delivery")
+    jsonflatten.show()
+    //jsonflatten.select("name").show()
+    //reference message states that name is ambiguous, we need to handle this to proceed further
+    //jsonflatten.columns is a list , here index as follows
+    //name-->0, product-->1,address -->2,mob-->3,name-->0 as it is an ambiguous column
+
+
+    //now iterating thuogh all the elements in df_cols
+    //now while we are iterating, if we get same element 2 times
+    jsonflatten.printSchema()
+    val df_cols = jsonflatten.columns
+    df_cols.take(5)
+    val lst = List[Int]()
+    def count(i:Int=>Boolean):Unit={
+      for(i<- df_cols){
+       if count(i) = 2
+         
+       })
+          
+        }))
+      }
+      
+    }
+
+
+
+
+
+  }
+}
