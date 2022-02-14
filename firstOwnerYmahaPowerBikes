@@ -1,0 +1,32 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.{SparkConf, SparkContext}
+
+object firstOwnerYmahaPowerBikes extends App {
+  Logger.getLogger("org").setLevel(Level.ERROR)
+  val conf = new SparkConf().setAppName("Filtering data according to requirement").setMaster("local[*]")
+  val sc = new SparkContext(conf)
+  //Requirement: To find the power Yamaha Bikes which mean it has the engine power as greater than 150cc and only handled
+  //by first owner
+  //converting to my project: To find the power calcigen product which mean it has the intensity greater than 150 mg and only handled by the owner belongs to the country DE?
+
+  // we are going to process here with RDD itself, but not dataframe
+  val sourceBikesRdd = sc.textFile("data/Used_Bikes.csv")
+  // we just keep only the plain data according to requirement , we gonna remove header
+//sourceBikesRdd.foreach(println)
+val splittedeRdd = sourceBikesRdd.map(line=>line.split(",").map(column=>column.trim))
+  val resultRDD = splittedeRdd.filter(bike => bike(4).
+    equalsIgnoreCase("First Owner") && bike(6).toDouble>150 &&
+    bike(7).equalsIgnoreCase("Yamaha"))
+  //resultRDD.foreach(println)
+  // wee need only bikes handled by first owner
+  resultRDD.map(model=>model(0)).distinct().foreach(println)
+  resultRDD.map(bike=>(bike(0),bike(4))).distinct().foreach(println)
+  println(resultRDD.count())
+  //we want to see only the model names
+
+
+
+
+}
