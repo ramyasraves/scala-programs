@@ -1,0 +1,47 @@
+package com.sundogsoftware.spark
+
+import breeze.linalg.sum
+import spire.math.Polynomial.x
+
+import scala.collection.immutable.Nil.head
+
+
+//Scala - Reduce, fold or scan (Left/Right)
+// Reduce, fold or scan can be used as reduceLeft,reduceRight, foldLeft , foldRight , scanLeft , scan Right
+//In general all these 6 methods can be used apply a binary operator on eacj element of a collection and the result
+//the result of each step is passed to the next step
+object usageOfFoldLeft {
+  var list1 = List.range(1,6)
+  //List(1,2,3,4,5)
+  var list2 = List("A","B","C")
+  val list3 = List(1,2,3,5,7,10,13)
+  def main(args: Array[String]): Unit = {
+
+    // we need to get the sum of first  integers
+   // println(list1.reduceLeft(_+_)) //first 2 elements of the list is passed here(1,2)
+    //next (1+2 = 3) will be passed as a first argument here and second argument is 3 here and so on..
+    println(list2.reduceLeft(_+_))
+    println(list2.reduceLeft((x,y)=>{println(x + ","+y); x+y;}))
+    //understand internally what  reduceLeft is doing,
+    println(list1.reduceLeft((x,y)=>{println(x + " , "+y); x+y;}))
+    println(list1.reduceRight((x,y)=>{println(x + " ,"+y); x+y;}))
+    println(list3.reduceLeft(_-_))
+    println(list3.reduceRight(_-_))
+    println(list3.reduceRight((x,y)=>{println(x + " ,"+y); x-y;}))
+    //Basically fold left and fold right is same as reduceLeft and reduce Right
+    //But the basic difference between reduceLeft,reduce Right and fold left, fold right is that we can pass an initial
+    //argument in foldLeft and foldRight
+    println(list1.foldLeft(0)(_+_)) // we passed initial value which is 0
+    //pass initial value 100
+    println(list1.foldLeft(100)(_+_)) //Here total 15 => 100+15 = 115
+    //here start value is 100, and the list elements are applied as the reduceLeft or reduceRight
+    println(list2.foldLeft("Bunny")(_+_))
+    //scan left and scan right: same as fold
+    // scan left and scan right takes the starting value also and then it will apply all the binary operation on the
+    //rest of the list elements
+    //Basic difference between scan and fold is , scan is going to give us the map of intermediate result also.
+    println(list1.scanLeft(100)(_+_))
+    println(list2.scanLeft("z")(_+_)) 
+  }
+
+}
