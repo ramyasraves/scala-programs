@@ -1,0 +1,35 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{aggregate, col, sum}
+import org.apache.spark.sql.types.IntegerType
+
+object transposeColumnInDataframe {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().appName("Transpose Subject Column").master("local[*]").getOrCreate()
+    //we have Roll No , subject and marks , we need subject wise marks specified in the column so we need to pivot the
+    //subject column
+    val df_student = spark.read.option("delimiter","|").option("header","true").option("inferschema","true").csv("data/input_studentmarks.csv")
+    df_student.show()
+    //if we need first 2 columns
+    df_student.select(df_student.columns.slice(0,2).map(m=>col(m)):_*).show()
+    df_student.printSchema()
+    //we are applying pivot function to transpose a column in to row
+    //Spark SQL provides pivot() function to rotate the data from one column into
+    // multiple columns (transpose row to column). It is an aggregation
+    // where one of the grouping columns values transposed into individual columns with distinct data.
+    //converting marks column to Integer datatype or we can set inferschema as true
+    val df_student1 = df_student.withColumn("MARKS",col("MARKS").cast(IntegerType))
+    df_student1.printSchema()
+    val df_student_marks = df_student1.groupBy("ROLL_NO").pivot("SUBJECT").sum("MARKS")
+    df_student_marks.show()
+    val df_students_totalmarks = df_student_marks.withColumn("Total",df_student_marks("English")+df_student_marks("History")+df_student_marks("Maths")+df_student_marks("Physics")+df_student_marks("Science"))
+    df_students_totalmarks.show(false)
+
+
+
+  }
+
+}
