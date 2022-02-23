@@ -1,0 +1,27 @@
+package com.sundogsoftware.spark
+import org.apache.spark.sql.DataFrameReader
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.sparkproject.dmg.pmml.True
+
+object modesInSparkDataReader {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().appName("Modes in Dataframe Reader").master("local[*]").getOrCreate()
+    //Here the invlaid records were not removed where incase if the clolumns has null values.
+    //This is example of premissive method, we haven't declared option as premissive but by default spark takes it as premissive
+    val df_modes = spark.read.option("header","true").csv("data/input1.csv")
+    //df_modes.show()
+    //*usually FAILFAST mode doesn't work in pyspark
+    val df_modes_failfast = spark.read.option("header","true").option("mode","FAILFAST").csv("data/input1.csv")
+    //df_modes.show()
+    //when we give FAILFAST , it will thrown an error stating that mode is fast mode and malformed csv records
+    //In this FAILFAST mode,it  will stop executing the further statements and it will fail
+    val schema_defined = StructType(Array(StructField("_c0",StringType,true),StructField("_c1",StringType,true),StructField("_c2",StringType,true)))
+    val df_modes_dropmalformed = spark.read.option("mode","DROPMALFORMED").csv("data/input1.csv")
+    df_modes_dropmalformed.show()
+    //In DROPMALFORMED mode, all the null values got removed and the corrupted records got removed, so with this
+    //we will be able to remove the corrupted records, we have to declare a schema in DROPMALFORMED mode
+  }
+}
