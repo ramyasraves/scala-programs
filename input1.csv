@@ -1,0 +1,15 @@
+Emp_no,Emp_name,Department
+101,Murugan,Healthcare
+Invalid Entry,Description:Bad Record,null
+102,Kannan,Finance
+Invalid Entry,Description:Unable to read the Record,null
+102,Mani,IT
+Connection lost,Description:Pooor Connection,null
+104,Pavan,HR
+105,Palani,Finance
+Bad Record,Description:corrupted record,null
+106,Murali,PROD
+107,Karthik,HR
+108,Sowmya,IT
+Bad Gateway,Description: Gatway lost,null
+109,Rajesh,Financea
