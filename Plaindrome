@@ -5,3 +5,28 @@ def palindromeCheck(st:String):Boolean={
 }
 println(palindromeCheck("ramya"))
 println(palindromeCheck("xyggyx"))
+
+========================================================================================================================================================================
+package com.sundogsoftware.spark
+
+object palindrome {
+  def main(args: Array[String]): Unit = {
+    println(palindrome(123456789.toString))
+  }
+  def palindrome(x:String):Unit={
+    var rev:String = ""
+    if (x.toString.forall(x=>x.isDigit)){
+      if(x.toString.length>1){
+        rev=x.toString.reverse
+      }
+      else if(x.length>1){
+        rev= x.reverse
+      }
+      if(rev==x) println("value is palindrome")
+      else println ("value is not palindrome")
+
+    }
+  }
+
+}
+
