@@ -1,0 +1,19 @@
+package com.sundogsoftware.spark
+
+object handlingExceptionInScala {
+  import scala.io.Source
+  import java.io.{FileNotFoundException,IOException}
+
+  def main(args: Array[String]): Unit = {
+val filename = "no-such-file.scala"
+    try {
+      for(line<- Source.fromFile("cust1.txt")){
+        println(line.toUpper)
+      }}
+      catch {
+        case e: FileNotFoundException =>println("couldn't find the specified file")
+        case e : IOException => println("Got an IO exception")
+      }
+    }
+
+}
