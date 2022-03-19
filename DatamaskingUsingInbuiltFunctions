@@ -1,0 +1,25 @@
+package com.sundogsoftware.spark
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+
+object DatamaskingUsingInbuiltFunctions {
+  def main(args: Array[String]): Unit = {
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val spark = SparkSession.builder().master("local[*]").appName("Data masking").getOrCreate()
+    val df = spark.read.option("header", "true").option("delimiter", ",").csv("data/mask_data.csv")
+    df.show(false)
+    // sample output : azar@gmail.com --> a**r@gmail.com
+    //sakthi.m2@gmail.com --> s*******2@gmail.com
+    //9842356173 --> 98******73
+    //9764510298 --> 97******98
+    df.createOrReplaceTempView("temp_table")
+    spark.sql( "select *,substring(split(email,'@')[0],1,1) " +
+      "|| regexp_replace(substring(split(email,'@')[0],2,length(split(email,'@')[0])-1),'[A-Za-z0-9_.]','*')||" +
+      "substring(split(email,'@')[0],-1,1) || '@' || split(email,'@')[1] masked_mail_usr," +
+      "substring(mobile,1,2)||regexp_replace(substring(mobile,2,length(mobile)-1),'[A-Za-z0-9_.]','*')||" +
+      "substring(mobile,-2,2) masked_phone_nbr from temp_table").show(false)
+
+  }
+
+}
