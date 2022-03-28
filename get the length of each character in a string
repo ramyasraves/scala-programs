@@ -1,0 +1,31 @@
+object MyClass {
+
+    def main(args: Array[String]) {
+        var str = "My Name is Ramya"
+        var mstr = str.groupBy(c=>c.toLower)
+        mstr.foreach(println)
+        
+       //output : (e,e)
+(s,s)
+(n,N)
+(y,yy)
+(a,aaa)
+(m,Mmm)
+(i,i)
+( ,   )
+(r,R)
+       
+        var mmstr = mstr.map(x=>(x._1,x._2.length))
+        mmstr.foreach(println)
+        output: 
+//(e,1)
+//(s,1)
+//(n,1)
+//(y,2)
+//(a,3)
+//(m,3)
+//(i,1)
+//( ,3)
+//(r,1)
+    }
+}
