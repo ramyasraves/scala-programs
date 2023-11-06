@@ -62,6 +62,7 @@ https://experienceleague.adobe.com/docs/experience-platform/xdm/classes/experien
 https://experienceleague.adobe.com/docs/experience-platform/xdm/schema/composition.html?lang=en
 
 Identity:
+Schemas are used for ingesting data into Experience Platform. This data can be used across multiple services to create a single, unified view of an individual entity.
 
 Notes: 
 ASDA has 2 categories of business:
@@ -69,4 +70,6 @@ George, Groceries
 A person bought clothes from George , while making bill payment , he /she was asked to provide email
 Same person bought Groceries from Grocery store, while making bill payment , he /she was asked to provide phone number.
 now ECID( Experience Cloud ID (ECID)) is the id which identiies these email and phone number from the same person and this profile is used.
+
+
 
