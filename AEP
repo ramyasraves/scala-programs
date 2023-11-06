@@ -12,6 +12,12 @@ an Azure Data Lake Storage Gen2 (hereinafter referred to as “ADLS Gen2”) sou
 Configure a dataflow to ingest batch data from a cloud storage source in the UI
 https://experienceleague.adobe.com/docs/experience-platform/sources/ui-tutorials/dataflow/cloud-storage.html?lang=en
 
+Cretion of fieldgroups:
+https://experienceleague.adobe.com/docs/platform-learn/tutorials/schemas/create-schema-field-groups.html?lang=en
+Field groups --> combination of datatypes and fields
+behaviour --> record or timeseries
+class --> XDM individual profile or XDM experience event
+
 
 
 
