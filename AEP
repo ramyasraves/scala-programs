@@ -1,3 +1,10 @@
+Project Introduction:
+Client: Walmart ASDA
+ASDA is British Super market chain which mainly deals with 2 categories such as Web George and Web Groceries. ASDA was previously collaborated with Walmart
+but now ASDA got separated from WALMART. As part of customer requirement , the source data which is already present in Azure blob has been imported to AEP Data Lake.
+
+
+
 Adobe Experience Platform:
 https://experienceleague.adobe.com/docs/experience-platform/profile/tutorials/add-profile-data.html?lang=en
 
