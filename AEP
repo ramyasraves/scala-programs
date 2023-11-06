@@ -1,0 +1,72 @@
+Adobe Experience Platform:
+https://experienceleague.adobe.com/docs/experience-platform/profile/tutorials/add-profile-data.html?lang=en
+
+postman is the platform used for calling RESTAPI
+
+Use Adobe Experience Data Model (XDM) to standardize customer experience data and define schemas for customer experience management.
+Enable a schema for Real-Time Customer Profile:
+
+
+Data being ingested into Experience Platform for use by Real-Time Customer Profile must conform to an Experience Data Model (XDM) schema that is enabled for Profile. 
+In order for a schema to be enabled for Profile, it must implement either the XDM Individual Profile or XDM ExperienceEvent class.
+
+You can enable a schema for use in Real-Time Customer Profile using the Schema Registry API or the Schema Editor user interface. 
+To get started, follow the tutorials for creating a schema using APIs or creating a schema using the Schema Editor UI.
+
+Add data using batch ingestion:
+
+All data uploaded to Platform using batch ingestion is uploaded to individual datasets. Before this data can be used by Real-Time Customer Profile, the dataset in question has to be specifically configured. For complete instructions, see the tutorial on configuring a dataset for Profile and Identity Service.
+
+Once the dataset has been configured, you can start ingesting data into it. See the batch ingestion developer guide for detailed steps on how to upload files in different formats.
+
+Add data using streaming ingestion:
+
+Any stream-ingested data that is compliant with a Profile-enabled XDM schema will automatically add or overwrite the appropriate record in Real-Time Customer Profile. 
+If more than one identity is supplied in the record, or time series data is consumed, those identities will be mapped in the identity graph without additional configuration. 
+See the streaming ingestion developer guide to learn more.
+
+Confirm that the upload is successful:
+
+
+When uploading data to a new dataset for the first time, or as part of a process involving a new ETL or data source,
+it is recommended to carefully check the data to ensure it has been uploaded correctly.
+
+Using the Real-Time Customer Profile Access API, you can retrieve batch data as it gets loaded into a dataset. 
+If you are unable to retrieve any of the entities you expect, your dataset may not be enabled for Profile. 
+After confirming that your dataset has been enabled, ensure that your source data format and identifiers support your expectations.
+
+For detailed instructions on how to access entities using the Real-Time Customer Profile API,
+  please refer to the entities endpoint guide, also known as the “Profile Access API”
+
+https://experienceleague.adobe.com/docs/experience-platform/xdm/home.html?lang=en
+
+XDM Schemas:
+Before data can be ingested into Platform, a schema must be composed to describe the data’s structure and
+provide constraints to the type of data that can be contained within each field.
+Schemas consist of a base class and zero or more schema field groups.
+Data behaviors in XDM System:
+
+Data intended for use in Experience Platform is grouped into three behavior types:
+
+Record: Provides information about the attributes of a subject. A subject could be an organization or an individual.
+Time-series: Provides a snapshot of the system at the time an action was taken either directly or indirectly by a record subject.
+Ad-hoc: Captures fields that are namespaced for usage only by a single dataset. Ad-hoc schemas are used in various data ingestion workflows for Experience Platform, including ingesting CSV files and creating certain kinds of source connections.
+All XDM schemas describe data that can be categorized as record or time series. The data behavior of a schema is defined by the schema’s class, which is assigned to a schema when it is first created.
+
+Although you are able to define your own classes within the Schema Registry, 
+it is recommended that you use the standard classes XDM Individual Profile and XDM ExperienceEvent 
+for record and time-series data, respectively.
+
+XDM ExperienceEvent class:
+https://experienceleague.adobe.com/docs/experience-platform/xdm/classes/experienceevent.html?lang=en
+https://experienceleague.adobe.com/docs/experience-platform/xdm/schema/composition.html?lang=en
+
+Identity:
+
+Notes: 
+ASDA has 2 categories of business:
+George, Groceries
+A person bought clothes from George , while making bill payment , he /she was asked to provide email
+Same person bought Groceries from Grocery store, while making bill payment , he /she was asked to provide phone number.
+now ECID( Experience Cloud ID (ECID)) is the id which identiies these email and phone number from the same person and this profile is used.
+
