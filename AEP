@@ -2,6 +2,17 @@ Project Introduction:
 Client: Walmart ASDA
 ASDA is British Super market chain which mainly deals with 2 categories such as Web George and Web Groceries. ASDA was previously collaborated with Walmart
 but now ASDA got separated from WALMART. As part of customer requirement , the source data which is already present in Azure blob has been imported to AEP Data Lake.
+How to import Source Data from Azure Blob to AEP Data Lake:
+https://experienceleague.adobe.com/docs/experience-platform/sources/ui-tutorials/create/cloud-storage/adls-gen2.html?lang=en
+
+Source connectors in Adobe Experience Platform provide the ability to ingest externally sourced data on a scheduled basis. 
+This tutorial provides steps for authenticating 
+an Azure Data Lake Storage Gen2 (hereinafter referred to as “ADLS Gen2”) source connector using the Platform user interface.
+
+Configure a dataflow to ingest batch data from a cloud storage source in the UI
+https://experienceleague.adobe.com/docs/experience-platform/sources/ui-tutorials/dataflow/cloud-storage.html?lang=en
+
+
 
 
 
