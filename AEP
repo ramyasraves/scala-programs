@@ -20,6 +20,31 @@ class --> XDM individual profile or XDM experience event
 DataType --> collection of fields
 Field --> Defines a single attribute
 
+Convert data model to XDM:
+How Data architects can take their existing transactional data model and convert it to an Experience Data Model
+https://experienceleague.adobe.com/docs/platform-learn/tutorials/schemas/convert-your-data-model-to-xdm.html?lang=en
+
+Expereince Data Model:
+Schemas:
+Standard and customer - defined options
+Ensures data integrity with strongly defined fields
+
+Data Integration:
+Batch or stream ingestion data into ZDM compliant datasets
+
+Segmentaion:
+Defining audiences using profile traits
+
+Realtime Cutomer profiles:
+360 degree view of a customer based on multiple data sources
+Enables personlization
+
+
+How Data architects can take their existing transactional data model and convert it to an Experience Data Model:
+
+
+
+
 
 
 
@@ -96,6 +121,9 @@ George, Groceries
 A person bought clothes from George , while making bill payment , he /she was asked to provide email
 Same person bought Groceries from Grocery store, while making bill payment , he /she was asked to provide phone number.
 now ECID( Experience Cloud ID (ECID)) is the id which identiies these email and phone number from the same person and this profile is used.
+
+Real-time customer profile:
+https://experienceleague.adobe.com/search.html?lang=en#q=real%20time%20customer%20profile&sort=relevancy&f:@el_contenttype=[Documentation]&f:el_product=[Experience%20Platform]
 
 
 
